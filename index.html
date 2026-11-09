@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Examen Fraccions 26-27</title>
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #1b1b1f;
+    --muted: #5b6070;
+    --line: #c9cfdb;
+    --accent: #1f4e9c;
+    --accent-soft: #e8eff9;
+    --paper: #ffffff;
+    --bg: #f2f4f8;
+    --shade: #9fc0ee;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: 64px; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 17px; line-height: 1.5;
+  }
+  .page { max-width: 860px; margin: 0 auto; padding: 72px 16px 48px; }
+  .sheet { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 24px 28px 28px; }
+
+  /* ---------- barra d'eines (només pantalla) ---------- */
+  .toolbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    background: var(--paper); border-bottom: 1px solid var(--line);
+    padding: 8px 12px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: center;
+  }
+  .toolbar > span { font-size: 14px; color: var(--muted); margin-right: 4px; }
+  .toolbar button {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; min-width: 44px; flex: 0 0 44px; height: 40px; margin: 0; padding: 0;
+    text-align: center; font-size: 20px; line-height: 1; vertical-align: middle;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--accent-soft); color: var(--ink); cursor: pointer;
+  }
+  .toolbar button:hover, .toolbar button:focus-visible { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: 1px; }
+  .toolbar button.fraction-insert { display: inline-flex; align-items: center; justify-content: center; }
+  .fraction-tool-icon { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 26px; height: 30px; margin: 0 auto; color: var(--ink); flex: 0 0 26px; }
+  .fraction-tool-icon span { display: block; width: 17px; height: 8px; margin: 0; border: 1.5px solid currentColor; border-radius: 2px; background: #fff; }
+  .fraction-tool-icon i { display: block; width: 25px; border-top: 2px solid currentColor; }
+
+  /* ---------- capçalera ---------- */
+  .head { border: 1.5px solid #000; margin-bottom: 18px; }
+  .head-top { display: grid; grid-template-columns: 270px 1fr; border-bottom: 1.5px solid #000; }
+  .head-top .inst { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-right: 1.5px solid #000; font-size: 14px; line-height: 1.3; }
+  .head-top .inst .crest { height: 46px; width: auto; flex: none; }
+  .head-top .tit { display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 22px; letter-spacing: .04em; }
+  .head-bottom { display: grid; grid-template-columns: 1fr 160px 120px; }
+  .head-bottom label { display: flex; align-items: center; gap: 8px; padding: 6px 12px; font-size: 15px; }
+  .head-bottom label + label { border-left: 1.5px solid #000; }
+  .head-bottom input { flex: 1; min-width: 0; border: 0; border-bottom: 1px dotted #666; font: inherit; padding: 4px 2px; background: transparent; color: var(--ink); }
+
+  .howto { background: var(--accent-soft); border-left: 4px solid var(--accent); border-radius: 6px; padding: 12px 16px; margin-bottom: 20px; font-size: 15.5px; }
+  .howto h2 { margin: 0 0 6px; font-size: 16px; color: var(--accent); }
+  .howto ul { margin: 0; padding-left: 20px; }
+  .howto code { background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+
+  /* ---------- exercicis ---------- */
+  h2.ex { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; font-size: 17.5px; font-weight: 400; line-height: 1.45;
+          margin: 26px 0 10px; padding-bottom: 6px; border-bottom: 0; color: var(--ink); }
+  h2.ex:first-of-type { margin-top: 8px; }
+  h2.ex strong { font-weight: 700; }
+  .eqline { text-align: center; font-size: 19px; margin: 6px 0 10px; }
+  .q { margin: 0 0 16px; break-inside: avoid; page-break-inside: avoid; }
+  .qh { display: flex; gap: 10px; align-items: baseline; margin-bottom: 6px; }
+  .qh > .n { font-weight: 400; min-width: 30px; }
+  .qh .t { flex: 1; }
+  .pts { font-size: 13.5px; font-weight: 400; color: var(--muted); white-space: nowrap; }
+  .q textarea {
+    display: block; width: 100%; min-height: 76px; resize: none; overflow: hidden;
+    font: inherit; font-size: 17px; line-height: 1.5; padding: 8px 10px; color: var(--ink); background: #fff;
+    border: 1.5px solid var(--line); border-radius: 8px;
+  }
+  .q textarea.short { min-height: 44px; }
+  .q textarea:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+  .note { font-size: 13.5px; color: var(--muted); margin: 0 0 6px 40px; }
+
+  /* camps per completar */
+  .fillrow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 6px 0 8px 40px; font-size: 18px; }
+  .fillrow .m { display: flex; align-items: center; line-height: 1; }
+  .fillrow .lbl { font-size: 14.5px; color: var(--muted); margin-right: -2px; }
+  .figure-answer-row { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; margin: 4px 0 10px; }
+  .figure-answer-row .fig { margin: 0 0 0 40px; }
+  .figure-answer-row .fillrow { margin: 0; }
+  .pair-comparison { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 12px; margin: 8px 40px 12px; text-align: center; font-size: 19px; }
+  .pair-comparison.single-pair { grid-template-columns: 1fr; }
+  .pair-comparison > div + div { border-left: 1px solid var(--line); }
+  .drawing-area { margin: 8px 0 12px 40px; }
+  .drawing-tools { display: flex; justify-content: flex-end; margin-bottom: 6px; }
+  .draw-clear { border: 1px solid var(--line); border-radius: 7px; background: var(--accent-soft); color: var(--ink); font: inherit; font-size: 13.5px; padding: 5px 10px; cursor: pointer; }
+  .q1b-canvas { display: block; width: 100%; height: 190px; border: 1.5px solid var(--line); border-radius: 8px; background: #fff; touch-action: none; cursor: crosshair; }
+  .workbox { margin: 8px 0 12px 40px; }
+  .workbox label { display: block; margin-bottom: 4px; font-size: 14.5px; color: var(--muted); }
+  .q textarea.q2-calc, .q textarea.q5-calc { min-height: 104px; }
+  .q textarea.q2-answer { min-height: 76px; }
+  .q5-line { display: flex; align-items: center; justify-content: flex-start; gap: 10px; margin: 4px 0 4px 1px; }
+  .q5-line .qh { flex: 0 1 auto; min-width: 0; margin: 0; }
+  .q5-line .qh .t { flex: 0 1 auto; }
+  .q5-equals { font-size: 20px; }
+  .q5-work { margin-top: 4px; }
+  .fillrow input.cell.sign { width: 44px; height: 44px; }
+  input.cell {
+    width: 76px; height: 42px; text-align: center; font: inherit; font-size: 18px; color: var(--ink); background: #fff;
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 2px 6px;
+  }
+  input.cell.sign { width: 56px; }
+  input.cell.ans { width: min(100%, 420px); text-align: left; padding: 2px 10px; }
+  input.cell:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+  .ff { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; }
+  .ff input.cell { width: 44px; height: 44px; padding: 2px; font-size: 17px; }
+  .ff .ln { width: 48px; border-top: 2.5px solid #000; }
+
+  /* fraccions apilades */
+  .frac { display: inline-block; vertical-align: middle; text-align: center; margin: 0 3px; line-height: 1.2; font-size: .95em; }
+  .frac .fn { display: block; padding: 0 4px; border-bottom: 1.5px solid currentColor; }
+  .frac .fd { display: block; padding: 0 4px; }
+  .par { font-size: 2em; line-height: 1; vertical-align: middle; font-weight: 300; }
+  .eq { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; font-size: 18px; margin: 4px 0 8px 40px; }
+
+  /* dibuixos */
+  .fig { margin: 4px 0 10px 40px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .fig svg { display: block; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-left: 40px; }
+  .opts[aria-label="Opcions de l’apartat b"] { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 76px; }
+  .opt { display: flex; align-items: center; gap: 10px; height: 76px; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 12px; cursor: pointer; }
+  .opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+  .opt input { width: 20px; height: 20px; accent-color: var(--accent); flex: 0 0 20px; }
+  .opt .figs { display: flex; flex: 1 1 auto; height: 100%; min-height: 0; flex-direction: column; align-self: stretch; justify-content: center; align-items: center; gap: 4px; }
+  .opt .figs > [data-bars] { display: block; line-height: 0; }
+  .opt .figs svg { display: block; margin: 0 auto; }
+
+  /* ---------- final ---------- */
+  .finish { background: var(--accent-soft); border-left: 4px solid var(--accent); border-radius: 6px; padding: 12px 16px; margin: 28px 0 0; font-size: 15.5px; }
+  .finish h2 { margin: 0 0 6px; font-size: 16px; color: var(--accent); }
+  .finish ol { margin: 0 0 12px; padding-left: 20px; }
+  .btn-print {
+    font: inherit; font-size: 16px; font-weight: 700; padding: 10px 20px; border-radius: 8px; border: 0;
+    background: var(--accent); color: #fff; cursor: pointer;
+  }
+  .btn-print:hover, .btn-print:focus-visible { outline: 3px solid #0d2f66; outline-offset: 2px; }
+  .button-example { display: inline-block; vertical-align: middle; margin: 0 3px; }
+  .inline-key { display: inline-flex; align-items: center; vertical-align: middle; margin: 0 2px; padding: 1px 8px; border: 1px solid #d6dfec; border-radius: 7px; background: #f8fbff; line-height: 1.45; white-space: nowrap; }
+  .saved { font-size: 13.5px; color: var(--muted); margin: 10px 0 0; }
+
+  @media (max-width: 640px) {
+    .sheet { padding: 16px; }
+    .fillrow { margin-left: 0; }
+    .fillrow .lbl { margin-right: 0; }
+    .figure-answer-row .fig { margin-left: 0; }
+    .drawing-area { margin-left: 0; }
+    .pair-comparison { margin-left: 0; margin-right: 0; }
+    .workbox { margin-left: 0; }
+    .q5-line { margin-left: 0; flex-wrap: wrap; }
+    .opts[aria-label="Opcions de l’apartat b"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .opt { padding: 6px 4px; gap: 4px; }
+    .head-top { grid-template-columns: 1fr; }
+    .head-top .inst { border-right: 0; border-bottom: 1.5px solid #000; }
+    .head-top .tit { padding: 10px; }
+    .head-bottom { grid-template-columns: 1fr; }
+    .head-bottom label + label { border-left: 0; border-top: 1.5px solid #000; }
+  }
+
+  /* ---------- impressió / PDF ---------- */
+  @page { size: A4; margin: 14mm; }
+  @media print {
+    body { background: #fff; font-size: 12.5pt; }
+    .page { padding: 0; max-width: none; }
+    .sheet { border: 0; padding: 0; border-radius: 0; }
+    .toolbar, .howto, .finish, .saved { display: none !important; }
+    .q textarea { border: 1px solid #888; font-size: 12pt; }
+    input.cell { border: 1px solid #888; }
+    .opt { border: 1px solid #888; }
+    .opt:has(input:checked) { background: #dfe8f6; border: 2px solid #000; }
+    h2.ex { break-after: avoid; page-break-after: avoid; border-bottom: 0; padding-bottom: 0; margin: 16px 0 8px; font-size: 12.5pt; }
+    .pts { font-size: 10pt; color: #000; }
+    .head input { border-bottom: 1px solid #000; }
+    .drawing-tools { display: none !important; }
+    .q1b-canvas { border: 1px solid #888; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar" role="toolbar" aria-label="Símbols per escriure">
+  <span>Insereix:</span>
+  <button type="button" class="fraction-insert" data-ins="/" aria-label="Insereix una fracció: barra entre numerador i denominador" title="Insereix la barra d'una fracció">
+    <span class="fraction-tool-icon" aria-hidden="true"><span></span><i></i><span></span></span>
+  </button>
+  <button type="button" data-ins="+" aria-label="més">+</button>
+  <button type="button" data-ins="−" aria-label="menys">−</button>
+  <button type="button" data-ins="·" aria-label="multiplicació">·</button>
+  <button type="button" data-ins=":" aria-label="divisió">:</button>
+  <button type="button" data-ins="=" aria-label="igual">=</button>
+  <button type="button" data-ins="≠" aria-label="diferent">≠</button>
+  <button type="button" data-ins=" &lt; " aria-label="menor que">&lt;</button>
+  <button type="button" data-ins=" &gt; " aria-label="major que">&gt;</button>
+  <button type="button" data-ins="(" aria-label="obre parèntesi">(</button>
+  <button type="button" data-ins=")" aria-label="tanca parèntesi">)</button>
+</div>
+
+<main class="page">
+<div class="sheet">
+
+  <div class="head">
+    <div class="head-top">
+      <div class="inst"><img class="crest" src="data:image/png;base64,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" alt="Logotip de la Generalitat de Catalunya"><div>Generalitat de Catalunya<br>Departament d’Educació<br><strong>Institut Barres i Ones</strong></div></div>
+      <div class="tit">FRACCIONS</div>
+    </div>
+    <div class="head-bottom">
+      <label>Nom i cognoms: <input id="nom" type="text" autocomplete="name"></label>
+      <label>Data: <input id="data" type="text"></label>
+      <label>Grup: <input id="grup" type="text"></label>
+    </div>
+  </div>
+
+  <div class="howto">
+    <h2>Abans de començar</h2>
+    <ul>
+      <li>Escriu les respostes a les caselles corresponents.</li>
+      <li>Fes servir la barra superior per inserir símbols matemàtics.</li>
+    </ul>
+  </div>
+
+  <!-- 1 -->
+  <h2 class="ex"><span class="exh"><strong>1.</strong> Representació i concepte de fracció.</span></h2>
+
+  <div class="q">
+    <div class="qh"><span class="n">a)</span><span class="t">Escriu quina fracció representa la part ombrejada del dibuix.</span></div>
+    <div class="figure-answer-row">
+      <div class="fig" role="img" aria-label="Dues barres dividides en tres parts iguals: la primera té les tres parts ombrejades i la segona en té dues"><span data-bars="3:3"></span><span data-bars="3:2"></span></div>
+      <div class="fillrow"><span class="ff" role="group" aria-label="la fracció de l’apartat a"><input type="text" class="cell" autocomplete="off" aria-label="Numerador de la fracció de l’apartat a"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador de la fracció de l’apartat a"></span></div>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="qh"><span class="n">b)</span><span class="t"><strong>Dibuixa</strong> una figura geomètrica (com un cercle o un rectangle) i representa-hi gràficament la fracció <span class="m">{13/5}</span>:</span></div>
+    <div class="drawing-area">
+      <div class="drawing-tools"><button type="button" class="draw-clear" id="clearDrawing">Esborra el dibuix</button></div>
+      <canvas id="q1bDrawing" class="q1b-canvas" width="1100" height="260" aria-label="Espai per dibuixar la representació gràfica de tretze cinquens"></canvas>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <h2 class="ex"><span class="exh"><strong>2.</strong> Fraccions equivalents.</span></h2>
+
+  <div class="q">
+    <div class="qh"><span class="n">a)</span><span class="t"><strong>Raona matemàticament</strong> si són <strong>equivalents</strong> o <strong>no</strong> els parells de fraccions següents:</span></div>
+    <div class="pair-comparison single-pair m" aria-label="Parell de fraccions a comparar">
+      <div>{2/7} i {30/105}</div>
+    </div>
+    <div class="workbox">
+      <label for="q2a-calc">Espai per les operacions:</label>
+      <textarea id="q2a-calc" class="q2-calc" data-k="q2a-calc" aria-label="Espai per les operacions de l’apartat a"></textarea>
+    </div>
+    <div class="workbox">
+      <label for="q2a-answer">Resposta:</label>
+      <textarea id="q2a-answer" class="q2-answer" data-k="q2a-answer" aria-label="Resposta de l’apartat a"></textarea>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="qh"><span class="n">b)</span><span class="t"><strong>Calcula</strong> el valor de <em>x</em> perquè les fraccions siguin <strong>equivalents</strong>.</span></div>
+    <div class="eqline m"><span class="frac"><span class="fn"><em>x</em></span><span class="fd">9</span></span> = {14/21}</div>
+    <div class="workbox">
+      <label for="q2b-calc">Espai per les operacions:</label>
+      <textarea id="q2b-calc" class="q2-calc" data-k="q2b-calc" aria-label="Espai per les operacions de l’apartat b"></textarea>
+    </div>
+    <div class="workbox">
+      <label for="q2b-answer">Resposta:</label>
+      <textarea id="q2b-answer" class="q2-answer" data-k="q2b-answer" aria-label="Resposta de l’apartat b"></textarea>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <h2 class="ex"><span class="exh"><strong>3.</strong> Escriu <strong>fraccions equivalents</strong> a <span class="m">{48/64}</span>:</span></h2>
+
+  <div class="q">
+    <div class="qh"><span class="n">a)</span><span class="t">Per <strong>amplificació</strong>:</span></div>
+    <div class="fillrow"><span class="m">{48/64}</span> = <span class="ff" role="group" aria-label="la primera fracció de l’apartat a"><input type="text" class="cell" autocomplete="off" aria-label="Numerador de la primera fracció de l’apartat a"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador de la primera fracció de l’apartat a"></span> = <span class="ff" role="group" aria-label="la segona fracció de l’apartat a"><input type="text" class="cell" autocomplete="off" aria-label="Numerador de la segona fracció de l’apartat a"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador de la segona fracció de l’apartat a"></span></div>
+  </div>
+
+  <div class="q">
+    <div class="qh"><span class="n">b)</span><span class="t">Per <strong>simplificació</strong>:</span></div>
+    <div class="fillrow"><span class="m">{48/64}</span> = <span class="ff" role="group" aria-label="la primera fracció de l’apartat b"><input type="text" class="cell" autocomplete="off" aria-label="Numerador de la primera fracció de l’apartat b"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador de la primera fracció de l’apartat b"></span> = <span class="ff" role="group" aria-label="la segona fracció de l’apartat b"><input type="text" class="cell" autocomplete="off" aria-label="Numerador de la segona fracció de l’apartat b"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador de la segona fracció de l’apartat b"></span></div>
+  </div>
+
+  <!-- 4 -->
+  <h2 class="ex"><span class="exh"><strong>4.</strong> <strong>Ordena</strong> de més gran a més petita les fraccions <span class="m">{3/8}</span>, <span class="m">{7/12}</span> i <span class="m">{13/6}</span> reduint-les prèviament a <strong>comú denominador</strong>.</span></h2>
+
+  <div class="q">
+    <div class="fillrow"><span class="lbl">m.c.m.</span><input type="text" class="cell" autocomplete="off" aria-label="Mínim comú múltiple dels denominadors"></div>
+    <div class="fillrow"><span class="lbl">Comú denominador:</span><span class="ff" role="group" aria-label="primera fracció amb comú denominador"><input type="text" class="cell" autocomplete="off" aria-label="Numerador de primera fracció amb comú denominador"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador de primera fracció amb comú denominador"></span><span class="ff" role="group" aria-label="segona fracció amb comú denominador"><input type="text" class="cell" autocomplete="off" aria-label="Numerador de segona fracció amb comú denominador"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador de segona fracció amb comú denominador"></span><span class="ff" role="group" aria-label="tercera fracció amb comú denominador"><input type="text" class="cell" autocomplete="off" aria-label="Numerador de tercera fracció amb comú denominador"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador de tercera fracció amb comú denominador"></span></div>
+    <div class="fillrow"><span class="lbl">Ordre:</span><span class="ff" role="group" aria-label="primera fracció de l’ordre"><input type="text" class="cell" autocomplete="off" aria-label="Numerador de primera fracció de l’ordre"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador de primera fracció de l’ordre"></span><input type="text" class="cell sign" autocomplete="off" aria-label="Primer signe"><span class="ff" role="group" aria-label="segona fracció de l’ordre"><input type="text" class="cell" autocomplete="off" aria-label="Numerador de segona fracció de l’ordre"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador de segona fracció de l’ordre"></span><input type="text" class="cell sign" autocomplete="off" aria-label="Segon signe"><span class="ff" role="group" aria-label="tercera fracció de l’ordre"><input type="text" class="cell" autocomplete="off" aria-label="Numerador de tercera fracció de l’ordre"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador de tercera fracció de l’ordre"></span></div>
+  </div>
+
+  <!-- 5 -->
+  <h2 class="ex"><span class="exh"><strong>5.</strong> <strong>Resol</strong> les següents operacions i <strong>simplifica</strong> el resultat fins a obtenir la <strong>fracció irreductible</strong>.</span></h2>
+
+  <div class="q">
+    <div class="q5-line">
+      <div class="qh"><span class="n">a)</span><span class="t m">{7/16} + {9/16} − {2/16}</span></div>
+      <span class="q5-equals">=</span>
+      <span class="ff" role="group" aria-label="Resultat de l’operació a"><input type="text" class="cell" autocomplete="off" aria-label="Numerador del resultat de l’operació a"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador del resultat de l’operació a"></span>
+    </div>
+    <div class="workbox q5-work">
+      <label for="q5a-work">Espai per les operacions:</label>
+      <textarea id="q5a-work" class="q5-calc" data-k="q5a" aria-label="Operacions de l’exercici 5a"></textarea>
+    </div>
+  </div>
+  <div class="q">
+    <div class="q5-line">
+      <div class="qh"><span class="n">b)</span><span class="t m">{2/3} + {1/4} − {1/6}</span></div>
+      <span class="q5-equals">=</span>
+      <span class="ff" role="group" aria-label="Resultat de l’operació b"><input type="text" class="cell" autocomplete="off" aria-label="Numerador del resultat de l’operació b"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador del resultat de l’operació b"></span>
+    </div>
+    <div class="workbox q5-work">
+      <label for="q5b-work">Espai per les operacions:</label>
+      <textarea id="q5b-work" class="q5-calc" data-k="q5b" aria-label="Operacions de l’exercici 5b"></textarea>
+    </div>
+  </div>
+  <div class="q">
+    <div class="q5-line">
+      <div class="qh"><span class="n">c)</span><span class="t m">{-3/2} · {4/9}</span></div>
+      <span class="q5-equals">=</span>
+      <span class="ff" role="group" aria-label="Resultat de l’operació c"><input type="text" class="cell" autocomplete="off" aria-label="Numerador del resultat de l’operació c"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador del resultat de l’operació c"></span>
+    </div>
+    <div class="workbox q5-work">
+      <label for="q5c-work">Espai per les operacions:</label>
+      <textarea id="q5c-work" class="q5-calc" data-k="q5c" aria-label="Operacions de l’exercici 5c"></textarea>
+    </div>
+  </div>
+  <div class="q">
+    <div class="q5-line">
+      <div class="qh"><span class="n">d)</span><span class="t m">{3/4} : {9/10}</span></div>
+      <span class="q5-equals">=</span>
+      <span class="ff" role="group" aria-label="Resultat de l’operació d"><input type="text" class="cell" autocomplete="off" aria-label="Numerador del resultat de l’operació d"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador del resultat de l’operació d"></span>
+    </div>
+    <div class="workbox q5-work">
+      <label for="q5d-work">Espai per les operacions:</label>
+      <textarea id="q5d-work" class="q5-calc" data-k="q5d" aria-label="Operacions de l’exercici 5d"></textarea>
+    </div>
+  </div>
+  <div class="q">
+    <div class="q5-line">
+      <div class="qh"><span class="n">e)</span><span class="t m">{5/8} + {1/4} : 3</span></div>
+      <span class="q5-equals">=</span>
+      <span class="ff" role="group" aria-label="Resultat de l’operació e"><input type="text" class="cell" autocomplete="off" aria-label="Numerador del resultat de l’operació e"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador del resultat de l’operació e"></span>
+    </div>
+    <div class="workbox q5-work">
+      <label for="q5e-work">Espai per les operacions:</label>
+      <textarea id="q5e-work" class="q5-calc" data-k="q5e" aria-label="Operacions de l’exercici 5e"></textarea>
+    </div>
+  </div>
+  <div class="q">
+    <div class="q5-line">
+      <div class="qh"><span class="n">f)</span><span class="t m"><span class="par">(</span>{1/3} + {5/9}<span class="par">)</span> · {5/4}</span></div>
+      <span class="q5-equals">=</span>
+      <span class="ff" role="group" aria-label="Resultat de l’operació f"><input type="text" class="cell" autocomplete="off" aria-label="Numerador del resultat de l’operació f"><span class="ln"></span><input type="text" class="cell" autocomplete="off" aria-label="Denominador del resultat de l’operació f"></span>
+    </div>
+    <div class="workbox q5-work">
+      <label for="q5f-work">Espai per les operacions:</label>
+      <textarea id="q5f-work" class="q5-calc" data-k="q5f" aria-label="Operacions de l’exercici 5f"></textarea>
+    </div>
+  </div>
+
+  <!-- FINAL -->
+  <div class="finish">
+    <h2>Has acabat?</h2>
+    <ol>
+      <li>Comprova que has escrit el teu nom i cognoms a dalt.</li>
+      <li>Prem <span class="inline-key">Desa l’examen</span>. S’obrirà la finestra d’impressió.</li>
+      <li>A «Destinació» tria <strong>Desa com a PDF</strong> i prem <strong>Desa</strong>.</li>
+      <li>Lliura el fitxer PDF al Classroom.</li>
+    </ol>
+    <button type="button" class="btn-print" id="btnPrint">Desa l’examen</button>
+  </div>
+
+</div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- fraccions apilades ---------- */
+  var FRAC = /\{(-?[\dx]+)\/([\dx]+)\}/g;
+  function paintFractions(el) {
+    el.innerHTML = el.innerHTML.replace(FRAC, function (_, n, d) {
+      n = n.replace("-", "\u2212");
+      return '<span class="frac"><span class="fn">' + n + '</span><span class="fd">' + d + '</span></span>';
+    });
+  }
+  document.querySelectorAll(".m").forEach(paintFractions);
+
+  /* ---------- barres de fraccions (SVG) ---------- */
+  function bar(n, k, small) {
+    var w = small ? 104 : 190, h = small ? 18 : 34, pw = w / n, s = "";
+    for (var i = 0; i < n; i++) {
+      s += '<rect x="' + (i * pw + 1) + '" y="1" width="' + pw + '" height="' + h +
+           '" fill="' + (i < k ? "#9fc0ee" : "#ffffff") + '" stroke="#000" stroke-width="' + (small ? 1.2 : 1.5) + '"/>';
+    }
+    return '<svg width="' + (w + 2) + '" height="' + (h + 2) + '" viewBox="0 0 ' + (w + 2) + ' ' + (h + 2) +
+           '" aria-hidden="true">' + s + '</svg>';
+  }
+  document.querySelectorAll("[data-bars]").forEach(function (el) {
+    var p = el.getAttribute("data-bars").split(":");
+    el.innerHTML = bar(parseInt(p[0], 10), parseInt(p[1], 10), el.hasAttribute("data-small"));
+  });
+
+  /* ---------- camps de text: ajust d'alçada ---------- */
+  var areas = Array.prototype.slice.call(document.querySelectorAll("textarea"));
+  function fit(t) { t.style.height = "auto"; t.style.height = (t.scrollHeight + 2) + "px"; }
+  areas.forEach(function (t) { t.addEventListener("input", function () { fit(t); }); });
+
+  /* ---------- botons de símbols ---------- */
+  var last = null;
+  var typers = Array.prototype.slice.call(document.querySelectorAll("input[type=text], textarea"));
+  typers.forEach(function (t) { t.addEventListener("focus", function () { last = t; }); });
+  document.querySelectorAll(".toolbar button").forEach(function (b) {
+    b.addEventListener("mousedown", function (e) { e.preventDefault(); }); // no perdre el focus
+    b.addEventListener("click", function () {
+      if (!last) { last = typers[0]; }
+      var txt = b.getAttribute("data-ins").trim();
+      var s = last.selectionStart != null ? last.selectionStart : last.value.length;
+      var e2 = last.selectionEnd != null ? last.selectionEnd : s;
+      var operators = ["+", "−", "·", ":", "=", "≠", "<", ">"]; 
+      var isOperator = operators.indexOf(txt) !== -1;
+      var before = last.value.slice(0, s);
+      var after = last.value.slice(e2);
+      var inserted = isOperator
+        ? (before && /\s$/.test(before) ? "" : " ") + txt + (after && /^\s/.test(after) ? "" : " ")
+        : txt;
+      last.value = before + inserted + after;
+      last.focus();
+      last.selectionStart = last.selectionEnd = s + inserted.length;
+      last.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  });
+
+  /* ---------- dibuix de l'exercici 1b ---------- */
+  var drawingCanvas = document.getElementById("q1bDrawing");
+  var drawingCtx = drawingCanvas.getContext("2d");
+  var drawingData = null;
+  var isDrawing = false;
+  drawingCtx.strokeStyle = "#1b1b1f";
+  drawingCtx.lineWidth = 4;
+  drawingCtx.lineCap = "round";
+  drawingCtx.lineJoin = "round";
+
+  function drawingPoint(e) {
+    var r = drawingCanvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - r.left) * drawingCanvas.width / r.width,
+      y: (e.clientY - r.top) * drawingCanvas.height / r.height
+    };
+  }
+  drawingCanvas.addEventListener("pointerdown", function (e) {
+    e.preventDefault();
+    isDrawing = true;
+    drawingCanvas.setPointerCapture(e.pointerId);
+    var p = drawingPoint(e);
+    drawingCtx.beginPath();
+    drawingCtx.moveTo(p.x, p.y);
+    drawingCtx.lineTo(p.x + 0.1, p.y + 0.1);
+    drawingCtx.stroke();
+  });
+  drawingCanvas.addEventListener("pointermove", function (e) {
+    if (!isDrawing) { return; }
+    e.preventDefault();
+    var p = drawingPoint(e);
+    drawingCtx.lineTo(p.x, p.y);
+    drawingCtx.stroke();
+  });
+  function finishDrawing() {
+    if (!isDrawing) { return; }
+    isDrawing = false;
+    drawingData = drawingCanvas.toDataURL("image/png");
+    save();
+  }
+  drawingCanvas.addEventListener("pointerup", finishDrawing);
+  drawingCanvas.addEventListener("pointercancel", finishDrawing);
+  drawingCanvas.addEventListener("lostpointercapture", finishDrawing);
+  document.getElementById("clearDrawing").addEventListener("click", function () {
+    drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+    drawingData = null;
+    save();
+  });
+
+  /* ---------- desat automàtic ---------- */
+  var KEY = "examen-fraccions-preexamen-26-27-v1";
+  var fields = Array.prototype.slice.call(document.querySelectorAll("input[type=text], textarea"));
+  var radios = Array.prototype.slice.call(document.querySelectorAll("input[type=radio]"));
+  function save() {
+    try {
+      var o = { f: {}, r: null, d: drawingData };
+      fields.forEach(function (el, i) { o.f[i] = el.value; });
+      radios.forEach(function (r) { if (r.checked) { o.r = r.value; } });
+      localStorage.setItem(KEY, JSON.stringify(o));
+    } catch (e) { /* sense emmagatzematge: no passa res */ }
+  }
+  function restore() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) { return; }
+      var o = JSON.parse(raw);
+      fields.forEach(function (el, i) { if (o.f && o.f[i] != null) { el.value = o.f[i]; } });
+      radios.forEach(function (r) { r.checked = (r.value === o.r); });
+      if (o.d) {
+        drawingData = o.d;
+        var savedDrawing = new Image();
+        savedDrawing.onload = function () { drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height); drawingCtx.drawImage(savedDrawing, 0, 0, drawingCanvas.width, drawingCanvas.height); };
+        savedDrawing.src = o.d;
+      }
+    } catch (e) { /* res */ }
+  }
+  restore();
+  areas.forEach(fit);
+  fields.concat(radios).forEach(function (el) {
+    el.addEventListener("input", save);
+    el.addEventListener("change", save);
+  });
+
+  /* ---------- imprimir / desar en PDF ---------- */
+  var nom = document.getElementById("nom");
+  document.getElementById("btnPrint").addEventListener("click", function () {
+    if (!nom.value.trim()) {
+      alert("Abans de desar l’examen, escriu el teu nom i cognoms a dalt.");
+      nom.scrollIntoView({ behavior: "smooth", block: "center" });
+      nom.focus();
+      return;
+    }
+    document.title = "Examen fraccions - " + nom.value.trim();   // nom suggerit per al PDF
+    areas.forEach(fit);
+    if (isDrawing) { finishDrawing(); }
+    window.print();
+  });
+  window.addEventListener("beforeprint", function () { areas.forEach(fit); if (isDrawing) { finishDrawing(); } });
+})();
+</script>
+</body>
+</html>
